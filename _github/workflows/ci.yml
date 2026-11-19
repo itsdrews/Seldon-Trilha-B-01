@@ -1,0 +1,43 @@
+name: Android CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: chmod +x gradlew
+
+      # Gate 1 (build) + Gate 2 (testes): compila o APK e roda os testes do core e do app
+      - name: Build e testes
+        run: ./gradlew assembleDebug :core:test :app:testDebugUnitTest --stacktrace
+
+      # Gate 3 (relatório): publica o APK e os relatórios de teste como artefatos.
+      # if: always() garante o relatório mesmo quando um teste falha.
+      - name: Publicar relatórios de teste
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios-de-teste
+          path: |
+            core/build/reports/tests/
+            app/build/reports/tests/
+
+      - name: Publicar APK de debug
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
