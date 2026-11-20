@@ -1,8 +1,6 @@
-# [NOME DO TIME]: Escudo
+# Tron: Escudo
 
 > SELDON · Missão 01 · **Trilha B: Cibersegurança**
->
-> ⚠️ Missão zero: troque `[NOME DO TIME]` pelo nome do time (tema de videogame) e avise a coordenação.
 
 ![CI](https://github.com/itsdrews/Seldon-Trilha-B-01/actions/workflows/ci.yml/badge.svg?branch=develop)
 
