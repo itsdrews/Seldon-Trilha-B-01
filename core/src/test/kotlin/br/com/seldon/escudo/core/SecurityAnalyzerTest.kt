@@ -1,5 +1,6 @@
 package br.com.seldon.escudo.core
 
+import br.com.seldon.escudo.core.rules.SecurityRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -48,5 +49,18 @@ class SecurityAnalyzerTest {
         val device = safeDevice().copy(developerOptionsEnabled = true, usbDebuggingEnabled = true)
         val severities = analyzer.analyze(device, TODAY).findings.map { it.severity }
         assertEquals(listOf(Severity.HIGH, Severity.LOW), severities)
+    }
+
+    @Test
+    fun `analyzer calcula a nota a partir das regras recebidas`() {
+        // Regra falsa: sempre dispara, isolando o analyzer das regras concretas
+        val fakeRule = SecurityRule { _, _ ->
+            Finding(id = "FAKE", title = "Regra falsa", severity = Severity.MEDIUM, recommendation = "-")
+        }
+        val report = SecurityAnalyzer(listOf(fakeRule)).analyze(safeDevice(), TODAY)
+
+        assertEquals(85, report.score)
+        assertEquals(RiskLevel.SEGURO, report.level)
+        assertEquals(listOf("FAKE"), report.findings.map { it.id })
     }
 }
